@@ -28,28 +28,38 @@ jobs:
               { name: 'api.yhn.kr', url: 'https://api.yhn.kr' }
             ];
 
-            let data = {
+            // 1. 상태 데이터 (상태.json)
+            let statusData = {
               systemState: 'operational',
               lastUpdated: '',
+              uptime: '100.00',
               services: [],
-              incidents: [],
               history: []
             };
 
+            // 2. 점검 데이터 (점검.json)
+            let maintenanceData = [];
+
+            // 3. 장애 데이터 (장애.json)
+            let incidentsData = [];
+
+            // 기존 JSON 파일들 로드
             if (fs.existsSync('status.json')) {
-              try {
-                const raw = fs.readFileSync('status.json', 'utf8');
-                data = JSON.parse(raw);
-              } catch (e) {}
+              try { statusData = JSON.parse(fs.readFileSync('status.json', 'utf8')); } catch (e) {}
+            }
+            if (fs.existsSync('maintenance.json')) {
+              try { maintenanceData = JSON.parse(fs.readFileSync('maintenance.json', 'utf8')); } catch (e) {}
+            }
+            if (fs.existsSync('incidents.json')) {
+              try { incidentsData = JSON.parse(fs.readFileSync('incidents.json', 'utf8')); } catch (e) {}
             }
 
-            if (!data.history) data.history = [];
-            if (!data.incidents) data.incidents = [];
+            if (!statusData.history) statusData.history = [];
 
             let allOk = true;
             const now = new Date();
             
-            // ★ 한국 시간(KST, UTC+9)으로 포맷팅
+            // KST 포맷팅
             const kstFormatter = new Intl.DateTimeFormat('ko-KR', {
               timeZone: 'Asia/Seoul',
               year: 'numeric',
@@ -86,13 +96,13 @@ jobs:
             }
 
             // 히스토리 누적 (최근 1000개)
-            data.history.push(currentCheck);
-            if (data.history.length > 1000) data.history.shift();
+            statusData.history.push(currentCheck);
+            if (statusData.history.length > 1000) statusData.history.shift();
 
             // 가동률 계산
             let totalChecks = 0;
             let upChecks = 0;
-            data.history.forEach(h => {
+            statusData.history.forEach(h => {
               h.services.forEach(s => {
                 totalChecks++;
                 if (s.status === 'operational') upChecks++;
@@ -101,14 +111,14 @@ jobs:
             const uptimeRatio = totalChecks > 0 ? ((upChecks / totalChecks) * 100).toFixed(2) : '100.00';
 
             // 장애 감지
-            const prevCheck = data.history.length > 1 ? data.history[data.history.length - 2] : null;
+            const prevCheck = statusData.history.length > 1 ? statusData.history[statusData.history.length - 2] : null;
             if (prevCheck) {
               targets.forEach(t => {
                 const prevStatus = prevCheck.services.find(s => s.name === t.name)?.status;
                 const currStatus = currentCheck.services.find(s => s.name === t.name)?.status;
 
                 if (prevStatus === 'operational' && currStatus === 'outage') {
-                  data.incidents.unshift({
+                  incidentsData.unshift({
                     id: Date.now(),
                     type: 'outage',
                     service: t.name,
@@ -121,7 +131,7 @@ jobs:
                 }
 
                 if (prevStatus === 'outage' && currStatus === 'operational') {
-                  const activeInc = data.incidents.find(i => i.service === t.name && i.duration === '진행 중');
+                  const activeInc = incidentsData.find(i => i.service === t.name && i.duration === '진행 중');
                   if (activeInc) {
                     const diffMin = Math.max(1, Math.round((now.getTime() - activeInc.startTime) / 60000));
                     activeInc.duration = `${diffMin}분 동안 발생`;
@@ -131,16 +141,19 @@ jobs:
               });
             }
 
-            data.systemState = allOk ? 'operational' : 'outage';
-            data.uptime = uptimeRatio;
-            data.lastUpdated = nowStr;
-            data.services = currentCheck.services;
+            statusData.systemState = allOk ? 'operational' : 'outage';
+            statusData.uptime = uptimeRatio;
+            statusData.lastUpdated = nowStr;
+            statusData.services = currentCheck.services;
 
-            fs.writeFileSync('status.json', JSON.stringify(data, null, 2));
+            // 3개의 분리된 JSON 파일로 저장
+            fs.writeFileSync('status.json', JSON.stringify(statusData, null, 2));
+            fs.writeFileSync('maintenance.json', JSON.stringify(maintenanceData, null, 2));
+            fs.writeFileSync('incidents.json', JSON.stringify(incidentsData, null, 2));
 
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add status.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "auto: update system status & history [KST]" && git push)
+          git add status.json maintenance.json incidents.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "auto: update system status, maintenance & incidents [KST]" && git push)
