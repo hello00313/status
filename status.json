@@ -1,6 +1,6 @@
 {
-  "systemState": "outage",
-  "lastUpdated": "2026. 07. 28. 18:28:14 KST",
+  "systemState": "operational",
+  "lastUpdated": "2026. 07. 28. 18:30:32 KST",
   "services": [
     {
       "name": "yhn.kr",
@@ -10,7 +10,7 @@
     {
       "name": "blog.yhn.kr",
       "url": "https://blog.yhn.kr",
-      "status": "outage"
+      "status": "operational"
     },
     {
       "name": "api.yhn.kr",
@@ -24,9 +24,9 @@
       "type": "outage",
       "service": "blog.yhn.kr",
       "title": "blog.yhn.kr 서비스 연결 장애 발생",
-      "time": "2026. 07. 28. 18:28:14 KST ~ 진행 중",
+      "time": "2026. 07. 28. 18:28:14 KST  ~ 18:30:32 (2분간)",
       "startTime": 1785230894853,
-      "duration": "진행 중",
+      "duration": "2분 동안 발생",
       "text": "자동 모니터링 시스템에 의해 응답 지연 또는 장애가 감지되었습니다."
     },
     {
@@ -3300,7 +3300,27 @@
           "status": "operational"
         }
       ]
+    },
+    {
+      "timestamp": "2026-07-28T09:30:32.719Z",
+      "services": [
+        {
+          "name": "yhn.kr",
+          "url": "https://yhn.kr",
+          "status": "operational"
+        },
+        {
+          "name": "blog.yhn.kr",
+          "url": "https://blog.yhn.kr",
+          "status": "operational"
+        },
+        {
+          "name": "api.yhn.kr",
+          "url": "https://api.yhn.kr",
+          "status": "operational"
+        }
+      ]
     }
   ],
-  "uptime": "97.92"
+  "uptime": "97.93"
 }
