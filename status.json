@@ -1,21 +1,21 @@
 {
-  "systemState": "outage",
-  "lastUpdated": "2026. 07. 28. 13:38:15 KST",
+  "systemState": "operational",
+  "lastUpdated": "2026. 07. 28. 13:40:20 KST",
   "services": [
     {
       "name": "yhn.kr",
       "url": "https://yhn.kr",
-      "status": "outage"
+      "status": "operational"
     },
     {
       "name": "blog.yhn.kr",
       "url": "https://blog.yhn.kr",
-      "status": "outage"
+      "status": "operational"
     },
     {
       "name": "api.yhn.kr",
       "url": "https://api.yhn.kr",
-      "status": "outage"
+      "status": "operational"
     }
   ],
   "incidents": [
@@ -24,9 +24,9 @@
       "type": "outage",
       "service": "api.yhn.kr",
       "title": "api.yhn.kr 서비스 연결 장애 발생",
-      "time": "2026. 07. 28. 13:36:15 KST ~ 진행 중",
+      "time": "2026. 07. 28. 13:36:15 KST  ~ 13:40:20 (4분간)",
       "startTime": 1785213375159,
-      "duration": "진행 중",
+      "duration": "4분 동안 발생",
       "text": "자동 모니터링 시스템에 의해 응답 지연 또는 장애가 감지되었습니다."
     },
     {
@@ -34,9 +34,9 @@
       "type": "outage",
       "service": "blog.yhn.kr",
       "title": "blog.yhn.kr 서비스 연결 장애 발생",
-      "time": "2026. 07. 28. 13:36:15 KST ~ 진행 중",
+      "time": "2026. 07. 28. 13:36:15 KST  ~ 13:40:20 (4분간)",
       "startTime": 1785213375159,
-      "duration": "진행 중",
+      "duration": "4분 동안 발생",
       "text": "자동 모니터링 시스템에 의해 응답 지연 또는 장애가 감지되었습니다."
     },
     {
@@ -44,9 +44,9 @@
       "type": "outage",
       "service": "yhn.kr",
       "title": "yhn.kr 서비스 연결 장애 발생",
-      "time": "2026. 07. 28. 13:36:15 KST ~ 진행 중",
+      "time": "2026. 07. 28. 13:36:15 KST  ~ 13:40:20 (4분간)",
       "startTime": 1785213375159,
-      "duration": "진행 중",
+      "duration": "4분 동안 발생",
       "text": "자동 모니터링 시스템에 의해 응답 지연 또는 장애가 감지되었습니다."
     },
     {
@@ -380,7 +380,27 @@
           "status": "outage"
         }
       ]
+    },
+    {
+      "timestamp": "2026-07-28T04:40:20.765Z",
+      "services": [
+        {
+          "name": "yhn.kr",
+          "url": "https://yhn.kr",
+          "status": "operational"
+        },
+        {
+          "name": "blog.yhn.kr",
+          "url": "https://blog.yhn.kr",
+          "status": "operational"
+        },
+        {
+          "name": "api.yhn.kr",
+          "url": "https://api.yhn.kr",
+          "status": "operational"
+        }
+      ]
     }
   ],
-  "uptime": "87.50"
+  "uptime": "88.24"
 }
