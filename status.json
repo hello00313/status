@@ -1,0 +1,47 @@
+{
+  "_comment_1": "==========================================================================",
+  "_comment_2": "[1] systemState (전체 상태) & status (개별 서비스 상태) 설정 가능 값",
+  "_comment_3": " - \"operational\" : 정상 작동 중 (초록색)",
+  "_comment_4": " - \"degraded\"    : 성능 지연 (주황색)",
+  "_comment_5": " - \"outage\"      : 서비스 장애 (빨간색)",
+  "_comment_6": " - \"maintenance\" : 점검 진행 중 (파란색)",
+  "_comment_7": "==========================================================================",
+  "_comment_8": "[2] incidents (공지사항) type 설정 가능 값",
+  "_comment_9": " - \"outage\"      : [장애] 라벨 (빨간색)",
+  "_comment_10": " - \"critical\"    : [심각한 장애] 라벨 (보라색)",
+  "_comment_11": " - \"maintenance\" : [점검] 라벨 (파란색)",
+  "_comment_12": " - \"scheduled\"   : [예정된 점검] 라벨 (주황색)",
+  "_comment_13": "==========================================================================",
+
+  "systemState": "operational",
+
+  "services": [
+    {
+      "name": "yhn.kr",
+      "url": "https://yhn.kr",
+      "description": "메인 웹사이트",
+      "status": "operational"
+    },
+    {
+      "name": "blog.yhn.kr",
+      "url": "https://blog.yhn.kr",
+      "description": "공식 블로그",
+      "status": "operational"
+    },
+    {
+      "name": "api.yhn.kr",
+      "url": "https://api.yhn.kr",
+      "description": "통합 API 서버",
+      "status": "operational"
+    }
+  ],
+
+  "incidents": [
+    {
+      "type": "scheduled",
+      "title": "API 서버 정기 DB 최적화",
+      "time": "2026.08.01 02:00 ~ 04:00",
+      "text": "새벽 시간대 작업으로 API 응답이 일시 지연될 수 있습니다."
+    }
+  ]
+}
