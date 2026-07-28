@@ -2,8 +2,8 @@ name: Uptime Monitor
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # 5분마다 자동 실행
-  workflow_dispatch: # 수동 실행 버튼 활성화
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,56 +15,123 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check Status and Update UI
-        run: |
-          # 1. 체크할 서비스 목록 (이름, URL)
-          SERVICES=(
-            "yhn.kr|https://yhn.kr"
-            "blog.yhn.kr|https://blog.yhn.kr"
-            "api.yhn.kr|https://api.yhn.kr"
-          )
+      - name: Run Uptime Check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // 1. 체크 대상 서비스
+            const targets = [
+              { name: 'yhn.kr', url: 'https://yhn.kr' },
+              { name: 'blog.yhn.kr', url: 'https://blog.yhn.kr' },
+              { name: 'api.yhn.kr', url: 'https://api.yhn.kr' }
+            ];
 
-          # 2. 핑 체크 로직
-          IS_ALL_OK=true
-          SERVICE_JSON_ITEMS=""
+            // 기존 status.json 데이터 불러오기
+            let data = {
+              systemState: 'operational',
+              lastUpdated: new Date().toISOString(),
+              services: [],
+              incidents: [],
+              history: []
+            };
 
-          for item in "${SERVICES[@]}"; do
-            NAME=$(echo $item | cut -d'|' -f1)
-            URL=$(echo $item | cut -d'|' -f2)
+            if (fs.existsSync('status.json')) {
+              try {
+                const raw = fs.readFileSync('status.json', 'utf8');
+                data = JSON.parse(raw);
+              } catch (e) {}
+            }
 
-            # HTTP 상태코드 확인 (200~399면 정상)
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL" || echo "000")
+            if (!data.history) data.history = [];
+            if (!data.incidents) data.incidents = [];
 
-            if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
-              STATE="operational"
-            else
-              STATE="outage"
-              IS_ALL_OK=false
-            fi
+            let allOk = true;
+            const now = new Date();
+            const nowStr = now.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
-            SERVICE_JSON_ITEMS="${SERVICE_JSON_ITEMS}{\"name\":\"$NAME\",\"url\":\"$URL\",\"status\":\"$STATE\"},"
-          done
+            const currentCheck = {
+              timestamp: now.toISOString(),
+              services: []
+            };
 
-          # 마지막 쉼표 제거
-          SERVICE_JSON_ITEMS=${SERVICE_JSON_ITEMS%,}
+            for (const t of targets) {
+              let isUp = false;
+              try {
+                const res = await fetch(t.url, { method: 'GET', signal: AbortSignal.timeout(8000) });
+                if (res.status >= 200 && res.status < 400) isUp = true;
+              } catch (err) {
+                isUp = false;
+              }
 
-          SYS_STATE="operational"
-          if [ "$IS_ALL_OK" = false ]; then
-            SYS_STATE="outage"
-          fi
+              if (!isUp) allOk = false;
 
-          # status.json 자동 생성
-          cat <<EOF > status.json
-          {
-            "systemState": "$SYS_STATE",
-            "lastUpdated": "$(date -u +'%Y-%m-%d %H:%M:%S UTC')",
-            "services": [$SERVICE_JSON_ITEMS]
-          }
-          EOF
+              currentCheck.services.push({
+                name: t.name,
+                url: t.url,
+                status: isUp ? 'operational' : 'outage'
+              });
+            }
+
+            // 히스토리 누적 (최근 1000개 기록 유지 - 약 3.5일치, 90일 바 생성용 데이터)
+            data.history.push(currentCheck);
+            if (data.history.length > 1000) data.history.shift();
+
+            // 가동률 계산 (전체 체크 기록 대비 정상 비율)
+            let totalChecks = 0;
+            let upChecks = 0;
+            data.history.forEach(h => {
+              h.services.forEach(s => {
+                totalChecks++;
+                if (s.status === 'operational') upChecks++;
+              });
+            });
+            const uptimeRatio = totalChecks > 0 ? ((upChecks / totalChecks) * 100).toFixed(2) : '100.00';
+
+            // 장애 발생/복구 자동 감지 및 공지(Incidents) 기록
+            const prevCheck = data.history.length > 1 ? data.history[data.history.length - 2] : null;
+            if (prevCheck) {
+              targets.forEach(t => {
+                const prevStatus = prevCheck.services.find(s => s.name === t.name)?.status;
+                const currStatus = currentCheck.services.find(s => s.name === t.name)?.status;
+
+                // 정상 -> 장애 (새 장애 생성)
+                if (prevStatus === 'operational' && currStatus === 'outage') {
+                  data.incidents.unshift({
+                    id: Date.now(),
+                    type: 'outage',
+                    service: t.name,
+                    title: `${t.name} 서비스 연결 장애 발생`,
+                    time: `${nowStr} ~ 진행 중`,
+                    startTime: now.getTime(),
+                    duration: '진행 중',
+                    text: '자동 모니터링 시스템에 의해 응답 지연 또는 장애가 감지되었습니다.'
+                  });
+                }
+
+                // 장애 -> 정상 (장애 종료 및 지속시간 계산)
+                if (prevStatus === 'outage' && currStatus === 'operational') {
+                  const activeInc = data.incidents.find(i => i.service === t.name && i.duration === '진행 중');
+                  if (activeInc) {
+                    const diffMin = Math.max(1, Math.round((now.getTime() - activeInc.startTime) / 60000));
+                    activeInc.duration = `${diffMin}분 동안 발생`;
+                    activeInc.time = `${activeInc.time.replace('~ 진행 중', '')} ~ ${nowStr.split(' ')[3] || ''} (${diffMin}분간)`;
+                  }
+                }
+              });
+            }
+
+            data.systemState = allOk ? 'operational' : 'outage';
+            data.uptime = uptimeRatio;
+            data.lastUpdated = nowStr;
+            data.services = currentCheck.services;
+
+            fs.writeFileSync('status.json', JSON.stringify(data, null, 2));
 
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add status.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "auto: update system status" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "auto: update system status & history" && git push)
