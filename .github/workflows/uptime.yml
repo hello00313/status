@@ -1,0 +1,70 @@
+name: Uptime Monitor
+
+on:
+  schedule:
+    - cron: '*/5 * * * *' # 5분마다 자동 실행
+  workflow_dispatch: # 수동 실행 버튼 활성화
+
+permissions:
+  contents: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Status and Update UI
+        run: |
+          # 1. 체크할 서비스 목록 (이름, URL)
+          SERVICES=(
+            "yhn.kr|https://yhn.kr"
+            "blog.yhn.kr|https://blog.yhn.kr"
+            "api.yhn.kr|https://api.yhn.kr"
+          )
+
+          # 2. 핑 체크 로직
+          IS_ALL_OK=true
+          SERVICE_JSON_ITEMS=""
+
+          for item in "${SERVICES[@]}"; do
+            NAME=$(echo $item | cut -d'|' -f1)
+            URL=$(echo $item | cut -d'|' -f2)
+
+            # HTTP 상태코드 확인 (200~399면 정상)
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL" || echo "000")
+
+            if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+              STATE="operational"
+            else
+              STATE="outage"
+              IS_ALL_OK=false
+            fi
+
+            SERVICE_JSON_ITEMS="${SERVICE_JSON_ITEMS}{\"name\":\"$NAME\",\"url\":\"$URL\",\"status\":\"$STATE\"},"
+          done
+
+          # 마지막 쉼표 제거
+          SERVICE_JSON_ITEMS=${SERVICE_JSON_ITEMS%,}
+
+          SYS_STATE="operational"
+          if [ "$IS_ALL_OK" = false ]; then
+            SYS_STATE="outage"
+          fi
+
+          # status.json 자동 생성
+          cat <<EOF > status.json
+          {
+            "systemState": "$SYS_STATE",
+            "lastUpdated": "$(date -u +'%Y-%m-%d %H:%M:%S UTC')",
+            "services": [$SERVICE_JSON_ITEMS]
+          }
+          EOF
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add status.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "auto: update system status" && git push)
