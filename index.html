@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>yhn.kr Status</title>
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-[#0B0F17] text-gray-900 dark:text-gray-100 antialiased min-h-screen font-sans selection:bg-indigo-500 selection:text-white">
+
+  <div class="max-w-2xl mx-auto w-full px-5 py-16">
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-12">
+      <div class="flex items-center space-x-3.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-950 font-bold flex items-center justify-center text-base shadow-sm">
+          Y
+        </div>
+        <div class="flex flex-col">
+          <h1 class="text-lg font-bold tracking-tight leading-none text-gray-900 dark:text-white">yhn.kr</h1>
+          <span class="text-[11px] font-medium text-gray-400 dark:text-gray-500 tracking-wider uppercase mt-1">System Status</span>
+        </div>
+      </div>
+      <a href="https://yhn.kr" target="_blank" class="text-xs font-medium text-gray-400 hover:text-gray-900 dark:text-gray-500 dark:hover:text-gray-200 transition-colors flex items-center gap-1 group">
+        <span>yhn.kr 방문</span>
+        <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </header>
+
+    <!-- Global Status Banner -->
+    <div id="status-banner" class="p-5 rounded-2xl border transition-all duration-300 mb-12 shadow-sm backdrop-blur-md">
+      <div class="flex items-center space-x-3">
+        <span class="relative flex h-3 w-3">
+          <span id="status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+          <span id="status-dot" class="relative inline-flex rounded-full h-3 w-3"></span>
+        </span>
+        <span id="status-text" class="font-semibold text-sm tracking-tight"></span>
+      </div>
+    </div>
+
+    <!-- Services Section -->
+    <section class="mb-14">
+      <div class="flex items-center justify-between mb-4 px-1">
+        <h2 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">서비스 현황</h2>
+      </div>
+      <div id="services-container" class="bg-white dark:bg-[#121824] rounded-2xl border border-gray-200/80 dark:border-gray-800/80 divide-y divide-gray-100 dark:divide-gray-800/60 shadow-sm overflow-hidden backdrop-blur-xl">
+        <!-- Dynamic content -->
+      </div>
+    </section>
+
+    <!-- Incident / Notice Section -->
+    <section>
+      <div class="flex items-center justify-between mb-4 px-1">
+        <h2 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">점검 및 공지 사항</h2>
+      </div>
+      <div id="incidents-container" class="space-y-4">
+        <!-- Dynamic content -->
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ⚙️ 상태 및 공지사항 설정
+    const CONFIG = {
+      // 메인 상태: 'operational' (정상), 'degraded' (지연), 'outage' (장애), 'maintenance' (점검중)
+      systemState: 'operational',
+
+      // 서비스별 상태 ('operational', 'degraded', 'outage', 'maintenance')
+      services: [
+        { name: 'yhn.kr', url: 'https://yhn.kr', description: '메인 웹사이트', status: 'operational' },
+        { name: 'blog.yhn.kr', url: 'https://blog.yhn.kr', description: '공식 블로그', status: 'operational' },
+        { name: 'api.yhn.kr', url: 'https://api.yhn.kr', description: '통합 API 서버', status: 'operational' }
+      ],
+
+      // 📢 공지사항 목록 (없을 경우 빈 배열 [])
+      // type 종류: 'outage' (장애), 'critical' (심각한 장애), 'maintenance' (점검), 'scheduled' (예정된 점검)
+      incidents: [
+        /* 예시:
+        {
+          type: 'scheduled', 
+          title: 'API 서버 정기 DB 점검 안내',
+          time: '2026.08.01 02:00 ~ 04:00',
+          text: 'DB 최적화 작업으로 인해 점검 시간 동안 API 응답이 일시적으로 지연될 수 있습니다.'
+        },
+        {
+          type: 'outage',
+          title: 'blog.yhn.kr 네트워크 접속 지연 발생',
+          time: '2026.07.28 14:00 ~ 14:30',
+          text: '트래픽 급증으로 인한 서비스 지연이 발생하여 복구 작업 중에 있습니다.'
+        }
+        */
+      ]
+    };
+
+    // 상태 스타일 정의
+    const STATUS_MAP = {
+      operational: { label: '정상 작동 중', color: 'bg-emerald-500 dark:bg-emerald-400', bannerBg: 'bg-emerald-50/80 dark:bg-emerald-950/20', bannerBorder: 'border-emerald-200/80 dark:border-emerald-800/40', textColor: 'text-emerald-900 dark:text-emerald-300', badgeBg: 'bg-emerald-50 dark:bg-emerald-950/40', badgeText: 'text-emerald-700 dark:text-emerald-400', msg: '모든 시스템이 정상 작동 중입니다.' },
+      degraded: { label: '성능 지연', color: 'bg-amber-500 dark:bg-amber-400', bannerBg: 'bg-amber-50/80 dark:bg-amber-950/20', bannerBorder: 'border-amber-200/80 dark:border-amber-800/40', textColor: 'text-amber-900 dark:text-amber-300', badgeBg: 'bg-amber-50 dark:bg-amber-950/40', badgeText: 'text-amber-700 dark:text-amber-400', msg: '일부 시스템 성능이 지연되고 있습니다.' },
+      outage: { label: '서비스 장애', color: 'bg-rose-500 dark:bg-rose-400', bannerBg: 'bg-rose-50/80 dark:bg-rose-950/20', bannerBorder: 'border-rose-200/80 dark:border-rose-800/40', textColor: 'text-rose-900 dark:text-rose-300', badgeBg: 'bg-rose-50 dark:bg-rose-950/40', badgeText: 'text-rose-700 dark:text-rose-400', msg: '일부 시스템에 장애가 감지되었습니다.' },
+      maintenance: { label: '점검 진행 중', color: 'bg-sky-500 dark:bg-sky-400', bannerBg: 'bg-sky-50/80 dark:bg-sky-950/20', bannerBorder: 'border-sky-200/80 dark:border-sky-800/40', textColor: 'text-sky-900 dark:text-sky-300', badgeBg: 'bg-sky-50 dark:bg-sky-950/40', badgeText: 'text-sky-700 dark:text-sky-400', msg: '현재 시스템 정기 점검이 진행 중입니다.' }
+    };
+
+    // 공지 유형 매핑 (단계별 4가지)
+    const INCIDENT_TYPES = {
+      outage: { label: '장애', badgeClass: 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300' },
+      critical: { label: '심각한 장애', badgeClass: 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300' },
+      maintenance: { label: '점검', badgeClass: 'bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300' },
+      scheduled: { label: '예정된 점검', badgeClass: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300' }
+    };
+
+    function renderUI() {
+      const globalCfg = STATUS_MAP[CONFIG.systemState] || STATUS_MAP.operational;
+
+      // Banner Render
+      const banner = document.getElementById('status-banner');
+      banner.className = `p-5 rounded-2xl border transition-all duration-300 mb-12 shadow-sm backdrop-blur-md ${globalCfg.bannerBg} ${globalCfg.bannerBorder}`;
+      document.getElementById('status-ping').className = `animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${globalCfg.color}`;
+      document.getElementById('status-dot').className = `relative inline-flex rounded-full h-3 w-3 ${globalCfg.color}`;
+      
+      const statusText = document.getElementById('status-text');
+      statusText.className = `font-semibold text-sm tracking-tight ${globalCfg.textColor}`;
+      statusText.innerText = globalCfg.msg;
+
+      // Services Render
+      const servicesHtml = CONFIG.services.map(s => {
+        const cfg = STATUS_MAP[s.status] || STATUS_MAP.operational;
+        return `
+          <div class="p-4 sm:p-5 flex items-center justify-between hover:bg-gray-50/60 dark:hover:bg-gray-800/30 transition-colors">
+            <div class="flex flex-col pr-4">
+              <a href="${s.url}" target="_blank" class="font-semibold text-sm text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                ${s.name}
+              </a>
+              <p class="text-xs text-gray-400 dark:text-gray-500 mt-1 font-normal leading-relaxed">${s.description}</p>
+            </div>
+            <div class="flex items-center space-x-2 shrink-0 px-2.5 py-1 rounded-full ${cfg.badgeBg}">
+              <span class="w-1.5 h-1.5 rounded-full ${cfg.color}"></span>
+              <span class="text-xs font-semibold ${cfg.badgeText}">${cfg.label}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      document.getElementById('services-container').innerHTML = servicesHtml;
+
+      // Incidents Render
+      const container = document.getElementById('incidents-container');
+      if (CONFIG.incidents && CONFIG.incidents.length > 0) {
+        container.innerHTML = CONFIG.incidents.map(item => {
+          const typeInfo = INCIDENT_TYPES[item.type] || INCIDENT_TYPES.maintenance;
+          return `
+            <div class="bg-white dark:bg-[#121824] p-5 rounded-2xl border border-gray-200/80 dark:border-gray-800/80 shadow-sm space-y-2">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center space-x-2">
+                  <span class="text-[11px] font-bold px-2 py-0.5 rounded-md ${typeInfo.badgeClass}">
+                    ${typeInfo.label}
+                  </span>
+                  <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">${item.title}</h3>
+                </div>
+                ${item.time ? `<span class="text-[11px] font-mono text-gray-400 dark:text-gray-500">${item.time}</span>` : ''}
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">${item.text}</p>
+            </div>
+          `;
+        }).join('');
+      } else {
+        container.innerHTML = `
+          <div class="text-center py-8 text-xs text-gray-400 dark:text-gray-600 bg-white dark:bg-[#121824] rounded-2xl border border-gray-200/80 dark:border-gray-800/80">
+            진행 중인 점검 및 특이사항 공지가 없습니다.
+          </div>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', renderUI);
+  </script>
+</body>
+</html>
