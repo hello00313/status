@@ -36,9 +36,9 @@
     }
   </style>
 </head>
-<body class="bg-gray-50 dark:bg-[#0B0F17] text-gray-900 dark:text-gray-100 antialiased min-h-screen font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+<body class="bg-gray-50 dark:bg-[#0B0F17] text-gray-900 dark:text-gray-100 antialiased min-h-screen font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200 flex flex-col justify-between">
 
-  <div class="max-w-2xl mx-auto w-full px-5 py-12">
+  <div class="max-w-2xl mx-auto w-full px-5 py-12 flex-1">
     <!-- Header -->
     <header class="flex items-center justify-between mb-10">
       <div class="flex items-center space-x-3">
@@ -81,14 +81,32 @@
       <div id="services-container" class="space-y-4"></div>
     </section>
 
-    <!-- Incident Log -->
-    <section>
+    <!-- Incident Log Section -->
+    <section class="mb-12">
       <div class="flex items-center justify-between mb-4 px-1">
         <h2 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">점검 및 장애 이력</h2>
+        
+        <!-- 필터 버튼 (전체 / 장애 / 점검) -->
+        <div class="flex items-center p-0.5 bg-gray-200/60 dark:bg-gray-800/60 rounded-lg text-xs font-medium">
+          <button id="filter-all" onclick="setFilter('all')" class="px-2.5 py-1 rounded-md transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-700 shadow-sm">
+            전체
+          </button>
+          <button id="filter-outage" onclick="setFilter('outage')" class="px-2.5 py-1 rounded-md transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+            장애
+          </button>
+          <button id="filter-maintenance" onclick="setFilter('maintenance')" class="px-2.5 py-1 rounded-md transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+            점검
+          </button>
+        </div>
       </div>
       <div id="incidents-container" class="space-y-3"></div>
     </section>
   </div>
+
+  <!-- Footer -->
+  <footer class="py-6 text-center text-xs text-gray-400 dark:text-gray-600 border-t border-gray-200/40 dark:border-gray-800/40 font-num">
+    Made by <span class="font-semibold text-gray-500 dark:text-gray-400">Y SERVICE</span>
+  </footer>
 
   <script>
     const STATUS_MAP = {
@@ -101,6 +119,9 @@
       maintenance: { label: '점검', badgeClass: 'bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800/40' },
       scheduled: { label: '예정된 점검', badgeClass: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800/40' }
     };
+
+    let allEventsData = [];
+    let currentFilter = 'all';
 
     async function loadData() {
       try {
@@ -118,15 +139,32 @@
         const incidentsData = Array.isArray(incidentsRes) ? incidentsRes : [];
 
         // 점검 내역과 장애 내역 합치기 (최신순 정렬)
-        const allEvents = [...maintenanceData, ...incidentsData].sort((a, b) => (b.id || 0) - (a.id || 0));
+        allEventsData = [...maintenanceData, ...incidentsData].sort((a, b) => (b.id || 0) - (a.id || 0));
 
-        render(statusData, allEvents);
+        renderStatusAndServices(statusData);
+        renderIncidents();
       } catch (e) {
         console.error('Failed to load status data:', e);
       }
     }
 
-    function render(data, incidents) {
+    function setFilter(filterType) {
+      currentFilter = filterType;
+      
+      // 버튼 스타일 업데이트
+      ['all', 'outage', 'maintenance'].forEach(type => {
+        const btn = document.getElementById(`filter-${type}`);
+        if (type === filterType) {
+          btn.className = "px-2.5 py-1 rounded-md transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-700 shadow-sm";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-md transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white";
+        }
+      });
+
+      renderIncidents();
+    }
+
+    function renderStatusAndServices(data) {
       const cfg = STATUS_MAP[data.systemState] || STATUS_MAP.operational;
 
       document.getElementById('status-ping').className = `animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${cfg.color}`;
@@ -176,10 +214,21 @@
           </div>
         `;
       }).join('');
+    }
 
+    function renderIncidents() {
       const incContainer = document.getElementById('incidents-container');
-      if (incidents && incidents.length > 0) {
-        incContainer.innerHTML = incidents.map(item => {
+      
+      // 필터링 적용 (장애: outage, 점검: maintenance 또는 scheduled)
+      const filtered = allEventsData.filter(item => {
+        if (currentFilter === 'all') return true;
+        if (currentFilter === 'outage') return item.type === 'outage';
+        if (currentFilter === 'maintenance') return item.type === 'maintenance' || item.type === 'scheduled';
+        return true;
+      });
+
+      if (filtered && filtered.length > 0) {
+        incContainer.innerHTML = filtered.map(item => {
           const typeInfo = INCIDENT_TYPES[item.type] || INCIDENT_TYPES.outage;
           return `
             <div class="bg-white/80 dark:bg-[#121824]/80 p-4 rounded-xl border border-gray-200/80 dark:border-gray-800/80 shadow-sm space-y-2">
@@ -195,9 +244,10 @@
           `;
         }).join('');
       } else {
+        const filterLabel = currentFilter === 'outage' ? '장애' : currentFilter === 'maintenance' ? '점검' : '';
         incContainer.innerHTML = `
           <div class="text-center py-8 text-xs text-gray-400 dark:text-gray-600 bg-white/40 dark:bg-[#121824]/40 rounded-xl border border-gray-200/80 dark:border-gray-800/80">
-            최근 기록된 장애 및 점검 내역이 없습니다.
+            기록된 ${filterLabel} 내역이 없습니다.
           </div>
         `;
       }
