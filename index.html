@@ -69,7 +69,7 @@
       </div>
       <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/60 flex justify-between items-center text-[11px] text-gray-400 dark:text-gray-500 font-num">
         <span id="last-updated">최근 점검 확인 중...</span>
-        <span>2분 간격 자동 체크</span>
+        <span>5분 간격 자동 체크</span>
       </div>
     </div>
 
@@ -104,15 +104,29 @@
 
     async function loadData() {
       try {
-        const res = await fetch('status.json?t=' + new Date().getTime());
-        const data = await res.json();
-        render(data);
+        const timestamp = new Date().getTime();
+        
+        // 3개의 JSON 파일(상태, 점검, 장애)을 병렬 수신
+        const [statusRes, maintenanceRes, incidentsRes] = await Promise.all([
+          fetch(`status.json?t=${timestamp}`).then(r => r.ok ? r.json() : {}),
+          fetch(`maintenance.json?t=${timestamp}`).then(r => r.ok ? r.json() : []),
+          fetch(`incidents.json?t=${timestamp}`).then(r => r.ok ? r.json() : [])
+        ]);
+
+        const statusData = statusRes || {};
+        const maintenanceData = Array.isArray(maintenanceRes) ? maintenanceRes : [];
+        const incidentsData = Array.isArray(incidentsRes) ? incidentsRes : [];
+
+        // 점검 내역과 장애 내역 합치기 (최신순 정렬)
+        const allEvents = [...maintenanceData, ...incidentsData].sort((a, b) => (b.id || 0) - (a.id || 0));
+
+        render(statusData, allEvents);
       } catch (e) {
-        console.error('Failed to load status:', e);
+        console.error('Failed to load status data:', e);
       }
     }
 
-    function render(data) {
+    function render(data, incidents) {
       const cfg = STATUS_MAP[data.systemState] || STATUS_MAP.operational;
 
       document.getElementById('status-ping').className = `animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${cfg.color}`;
@@ -157,15 +171,15 @@
             
             <div class="flex justify-between text-[11px] text-gray-400 dark:text-gray-500 font-num">
               <span>최근 30회 기록</span>
-              <span class="text-gray-600 dark:text-gray-400 font-medium">99.9% Uptime</span>
+              <span class="text-gray-600 dark:text-gray-400 font-medium">${data.uptime || '100.00'}% Uptime</span>
             </div>
           </div>
         `;
       }).join('');
 
       const incContainer = document.getElementById('incidents-container');
-      if (data.incidents && data.incidents.length > 0) {
-        incContainer.innerHTML = data.incidents.map(item => {
+      if (incidents && incidents.length > 0) {
+        incContainer.innerHTML = incidents.map(item => {
           const typeInfo = INCIDENT_TYPES[item.type] || INCIDENT_TYPES.outage;
           return `
             <div class="bg-white/80 dark:bg-[#121824]/80 p-4 rounded-xl border border-gray-200/80 dark:border-gray-800/80 shadow-sm space-y-2">
