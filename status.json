@@ -1,24 +1,54 @@
 {
-  "systemState": "operational",
-  "lastUpdated": "2026. 07. 28. 21:36:22 KST",
+  "systemState": "outage",
+  "lastUpdated": "2026. 07. 28. 21:38:23 KST",
   "services": [
     {
       "name": "yhn.kr",
       "url": "https://yhn.kr",
-      "status": "operational"
+      "status": "outage"
     },
     {
       "name": "blog.yhn.kr",
       "url": "https://blog.yhn.kr",
-      "status": "operational"
+      "status": "outage"
     },
     {
       "name": "api.yhn.kr",
       "url": "https://api.yhn.kr",
-      "status": "operational"
+      "status": "outage"
     }
   ],
   "incidents": [
+    {
+      "id": 1785242327278,
+      "type": "outage",
+      "service": "api.yhn.kr",
+      "title": "api.yhn.kr 서비스 연결 장애 발생",
+      "time": "2026. 07. 28. 21:38:23 KST ~ 진행 중",
+      "startTime": 1785242303242,
+      "duration": "진행 중",
+      "text": "자동 모니터링 시스템에 의해 응답 지연 또는 장애가 감지되었습니다."
+    },
+    {
+      "id": 1785242327278,
+      "type": "outage",
+      "service": "blog.yhn.kr",
+      "title": "blog.yhn.kr 서비스 연결 장애 발생",
+      "time": "2026. 07. 28. 21:38:23 KST ~ 진행 중",
+      "startTime": 1785242303242,
+      "duration": "진행 중",
+      "text": "자동 모니터링 시스템에 의해 응답 지연 또는 장애가 감지되었습니다."
+    },
+    {
+      "id": 1785242327278,
+      "type": "outage",
+      "service": "yhn.kr",
+      "title": "yhn.kr 서비스 연결 장애 발생",
+      "time": "2026. 07. 28. 21:38:23 KST ~ 진행 중",
+      "startTime": 1785242303242,
+      "duration": "진행 중",
+      "text": "자동 모니터링 시스템에 의해 응답 지연 또는 장애가 감지되었습니다."
+    },
     {
       "id": 1785234873694,
       "type": "outage",
@@ -5220,7 +5250,27 @@
           "status": "operational"
         }
       ]
+    },
+    {
+      "timestamp": "2026-07-28T12:38:23.242Z",
+      "services": [
+        {
+          "name": "yhn.kr",
+          "url": "https://yhn.kr",
+          "status": "outage"
+        },
+        {
+          "name": "blog.yhn.kr",
+          "url": "https://blog.yhn.kr",
+          "status": "outage"
+        },
+        {
+          "name": "api.yhn.kr",
+          "url": "https://api.yhn.kr",
+          "status": "outage"
+        }
+      ]
     }
   ],
-  "uptime": "98.43"
+  "uptime": "98.05"
 }
