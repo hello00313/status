@@ -15,9 +15,9 @@
   </script>
 
   <style>
-    /* 📌 기본(Default) 글자 크기: 기존 대비 120% 비율 적용 */
+    /* 📌 기본(Default) 글자 크기: 100% (16px) 복원 */
     html {
-      font-size: 19.2px; /* Standard 16px * 120% = 19.2px */
+      font-size: 16px;
     }
 
     body {
@@ -28,7 +28,7 @@
 
     .bar-item {
       flex: 1;
-      height: 20px;
+      height: 18px;
       border-radius: 4px;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -76,10 +76,10 @@
 
     /* ♿ 접근성 시스템: 큰 글씨 모드 (Large Font: 140% 비율로 확대) */
     body.large-font {
-      font-size: 116.6% !important; /* Base 120% * 116.6% ≈ 140% 적용 */
+      font-size: 140% !important;
     }
-    body.large-font h1 { font-size: 1.35rem !important; }
-    body.large-font h2 { font-size: 1.05rem !important; }
+    body.large-font h1 { font-size: 1.4rem !important; }
+    body.large-font h2 { font-size: 1.1rem !important; }
     body.large-font .text-xs { font-size: 0.95rem !important; }
     body.large-font .text-\[11px\] { font-size: 0.88rem !important; }
     body.large-font .text-xl { font-size: 1.85rem !important; }
@@ -108,7 +108,7 @@
     <!-- Header -->
     <header class="flex items-center justify-between mb-10">
       <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-950 font-bold flex items-center justify-center text-sm shadow-sm" aria-hidden="true">
+        <div class="w-8 h-8 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-950 font-bold flex items-center justify-center text-sm shadow-sm" aria-hidden="true">
           Y
         </div>
         <h1 class="text-base font-bold tracking-tight text-gray-900 dark:text-white">Y SERVICES STATUS</h1>
@@ -125,9 +125,9 @@
     <div id="status-banner" class="p-6 rounded-3xl border transition-all duration-300 mb-10 bg-white/70 dark:bg-[#111726]/70 border-gray-200/70 dark:border-gray-800/80 shadow-xl shadow-gray-200/20 dark:shadow-none backdrop-blur-xl" role="region" aria-label="전체 시스템 상태 정보">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <span class="relative flex h-3.5 w-3.5" aria-hidden="true">
+          <span class="relative flex h-3 w-3" aria-hidden="true">
             <span id="status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
-            <span id="status-dot" class="relative inline-flex rounded-full h-3.5 w-3.5"></span>
+            <span id="status-dot" class="relative inline-flex rounded-full h-3 w-3"></span>
           </span>
           <span id="status-text" class="font-bold text-base tracking-tight"></span>
         </div>
@@ -175,13 +175,29 @@
     Made by <span class="font-semibold text-gray-500 dark:text-gray-400">Y SERVICE</span>
   </footer>
 
-  <!-- ♿ 통합 메인 UI 스타일의 접근성 Floating 버튼 -->
+  <!-- ♿ 접기/펼치기가 가능한 하단 접근성 설정 Floating 버튼 -->
   <div class="fixed bottom-6 right-6 z-40">
-    <button onclick="toggleA11yModal()" class="flex items-center gap-2 px-4 py-2.5 bg-gray-900/90 dark:bg-white/90 hover:bg-gray-900 dark:hover:bg-white text-white dark:text-gray-900 font-semibold text-xs rounded-2xl shadow-xl shadow-gray-900/10 dark:shadow-none backdrop-blur-md transition-all hover:scale-105 focus:outline-none border border-white/10 dark:border-black/10" aria-label="웹 접근성 설정 메뉴 열기">
-      <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+    <!-- 1. 펼침 상태 패널 -->
+    <div id="a11y-fab-expanded" class="flex items-center gap-1 p-1 bg-gray-900/90 dark:bg-white/90 text-white dark:text-gray-900 rounded-2xl shadow-xl shadow-gray-900/10 dark:shadow-none backdrop-blur-md transition-all border border-white/10 dark:border-black/10">
+      <button onclick="toggleA11yModal()" class="flex items-center gap-2 pl-3 pr-2 py-1.5 font-semibold text-xs hover:opacity-80 transition-opacity focus:outline-none" aria-label="웹 접근성 설정 메뉴 열기">
+        <svg class="w-4 h-4 fill-current text-blue-400 dark:text-blue-600" viewBox="0 0 24 24">
+          <path d="M12 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-1 6v3H8v2h3v9h2v-9h3v-2h-3V8h-2z"/>
+        </svg>
+        <span>접근성 설정</span>
+      </button>
+      <div class="w-[1px] h-4 bg-white/20 dark:bg-black/20"></div>
+      <button onclick="minimizeA11yFab(true)" class="p-1.5 hover:bg-white/10 dark:hover:bg-black/10 rounded-xl transition-colors text-gray-300 dark:text-gray-600 hover:text-white dark:hover:text-black" title="버튼 최소화" aria-label="접근성 버튼 숨기기">
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+          <path d="M19 13H5v-2h14v2z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 2. 최소화(숨김) 상태 아이콘 버튼 -->
+    <button id="a11y-fab-minimized" onclick="minimizeA11yFab(false); toggleA11yModal();" class="hidden w-10 h-10 bg-gray-900/90 dark:bg-white/90 text-white dark:text-gray-900 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-all backdrop-blur-md border border-white/10 dark:border-black/10 focus:outline-none" title="웹 접근성 설정 열기" aria-label="접근성 설정 펼치기">
+      <svg class="w-5 h-5 fill-current text-blue-400 dark:text-blue-600" viewBox="0 0 24 24">
         <path d="M12 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-1 6v3H8v2h3v9h2v-9h3v-2h-3V8h-2z"/>
       </svg>
-      <span>접근성 설정</span>
     </button>
   </div>
 
@@ -212,7 +228,7 @@
         <button onclick="toggleA11yFeature('large-font')" class="w-full flex items-center justify-between p-3.5 rounded-2xl border border-gray-200/60 dark:border-gray-800 hover:bg-gray-50/80 dark:hover:bg-gray-800/40 transition-all text-left">
           <div>
             <span class="font-semibold text-xs text-gray-900 dark:text-gray-100 block">큰 글씨 확대 (140%)</span>
-            <span class="text-[11px] text-gray-400 dark:text-gray-500">기본 120%에서 140%로 더욱 크게 봅니다</span>
+            <span class="text-[11px] text-gray-400 dark:text-gray-500">기본 100%에서 140%로 더욱 크게 봅니다</span>
           </div>
           <span id="badge-large-font" class="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-400">OFF</span>
         </button>
@@ -275,6 +291,22 @@
     let allEventsData = [];
     let currentFilter = 'all';
 
+    /* ♿ 플로팅 접근성 버튼 최소화/펼침 제어 */
+    function minimizeA11yFab(isMinimize) {
+      const expanded = document.getElementById('a11y-fab-expanded');
+      const minimized = document.getElementById('a11y-fab-minimized');
+      
+      if (isMinimize) {
+        expanded.classList.add('hidden');
+        minimized.classList.remove('hidden');
+        localStorage.setItem('a11y_fab_minimized', 'true');
+      } else {
+        expanded.classList.remove('hidden');
+        minimized.classList.add('hidden');
+        localStorage.setItem('a11y_fab_minimized', 'false');
+      }
+    }
+
     function toggleA11yModal() {
       const modal = document.getElementById('a11y-modal');
       modal.classList.toggle('hidden');
@@ -308,6 +340,11 @@
         }
       });
       updateA11yBadges();
+
+      // 접근성 버튼 최소화 상태 복원
+      if (localStorage.getItem('a11y_fab_minimized') === 'true') {
+        minimizeA11yFab(true);
+      }
     }
 
     async function loadData() {
@@ -352,7 +389,7 @@
       const cfg = STATUS_MAP[data.systemState] || STATUS_MAP.operational;
 
       document.getElementById('status-ping').className = `animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${cfg.color}`;
-      document.getElementById('status-dot').className = `relative inline-flex rounded-full h-3.5 w-3.5 ${cfg.color}`;
+      document.getElementById('status-dot').className = `relative inline-flex rounded-full h-3 w-3 ${cfg.color}`;
       document.getElementById('status-text').innerText = cfg.msg;
       document.getElementById('status-text').className = `font-bold text-base tracking-tight ${cfg.textColor}`;
       document.getElementById('uptime-percentage').innerText = (data.uptime || '100.00') + '%';
