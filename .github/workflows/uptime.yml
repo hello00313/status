@@ -28,6 +28,8 @@ jobs:
               { name: 'Y SERVICE (API)', url: 'https://api.yhn.kr' }
             ];
 
+            const LATENCY_THRESHOLD_MS = 2000; // 2초 이상 지연 시 degraded 상태 처리
+
             // 1. 상태 데이터 (status.json)
             let statusData = {
               systemState: 'operational',
@@ -58,7 +60,7 @@ jobs:
 
             const now = new Date();
             const nowMs = now.getTime();
-            const ONE_DAY_MS = 24 * 60 * 60 * 1000; // 24시간 밀리초
+            const ONE_DAY_MS = 24 * 60 * 60 * 1000; // 24시간
             
             // KST 포맷팅
             const kstFormatter = new Intl.DateTimeFormat('ko-KR', {
@@ -78,23 +80,40 @@ jobs:
               services: []
             };
 
-            let downCount = 0;
+            let outageCount = 0;
+            let degradedCount = 0;
 
             for (const t of targets) {
-              let isUp = false;
+              let status = 'outage';
+              let responseTime = 0;
+              const startTime = Date.now();
+
               try {
                 const res = await fetch(t.url, { method: 'GET', signal: AbortSignal.timeout(8000) });
-                if (res.status >= 200 && res.status < 400) isUp = true;
+                responseTime = Date.now() - startTime;
+
+                if (res.status >= 200 && res.status < 400) {
+                  if (responseTime >= LATENCY_THRESHOLD_MS) {
+                    status = 'degraded';
+                  } else {
+                    status = 'operational';
+                  }
+                } else {
+                  status = 'outage';
+                }
               } catch (err) {
-                isUp = false;
+                responseTime = Date.now() - startTime;
+                status = 'outage';
               }
 
-              if (!isUp) downCount++;
+              if (status === 'outage') outageCount++;
+              if (status === 'degraded') degradedCount++;
 
               currentCheck.services.push({
                 name: t.name,
                 url: t.url,
-                status: isUp ? 'operational' : 'outage'
+                status: status,
+                latency: responseTime
               });
             }
 
@@ -102,13 +121,13 @@ jobs:
             statusData.history.push(currentCheck);
             if (statusData.history.length > 1000) statusData.history.shift();
 
-            // 1. 전체 가동률 계산
+            // 1. 전체 가동률 계산 (operational 및 degraded 모두 정상 연결로 간주)
             let totalChecks = 0;
             let upChecks = 0;
             statusData.history.forEach(h => {
               h.services.forEach(s => {
                 totalChecks++;
-                if (s.status === 'operational') upChecks++;
+                if (s.status === 'operational' || s.status === 'degraded') upChecks++;
               });
             });
             const totalUptimeRatio = totalChecks > 0 ? ((upChecks / totalChecks) * 100).toFixed(2) : '100.00';
@@ -122,29 +141,31 @@ jobs:
                 const match = (h.services || []).find(s => s.name === t.name);
                 if (match) {
                   serviceTotal++;
-                  if (match.status === 'operational') serviceUp++;
+                  if (match.status === 'operational' || match.status === 'degraded') serviceUp++;
                 }
               });
 
               const serviceUptime = serviceTotal > 0 ? ((serviceUp / serviceTotal) * 100).toFixed(2) : '100.00';
-              const currentServiceStatus = currentCheck.services.find(s => s.name === t.name)?.status || 'operational';
+              const currentSvc = currentCheck.services.find(s => s.name === t.name);
 
               return {
                 name: t.name,
                 url: t.url,
-                status: currentServiceStatus,
+                status: currentSvc?.status || 'operational',
+                latency: currentSvc?.latency || 0,
                 uptime: serviceUptime
               };
             });
 
-            // 3. 장애 감지
+            // 3. 장애 및 지연 감지 이력 생성
             const prevCheck = statusData.history.length > 1 ? statusData.history[statusData.history.length - 2] : null;
             if (prevCheck) {
               targets.forEach(t => {
                 const prevStatus = prevCheck.services.find(s => s.name === t.name)?.status;
                 const currStatus = currentCheck.services.find(s => s.name === t.name)?.status;
 
-                if (prevStatus === 'operational' && currStatus === 'outage') {
+                // 정상 -> 장애
+                if (prevStatus !== 'outage' && currStatus === 'outage') {
                   incidentsData.unshift({
                     id: Date.now(),
                     type: 'outage',
@@ -153,11 +174,27 @@ jobs:
                     time: `${nowStr} ~ 진행 중`,
                     startTime: nowMs,
                     duration: '진행 중',
-                    text: '자동 모니터링 시스템에 의해 응답 지연 또는 장애가 감지되었습니다.'
+                    text: '자동 모니터링 시스템에 의해 응답 중단 또는 접속 불가 상태가 감지되었습니다.'
                   });
                 }
 
-                if (prevStatus === 'outage' && currStatus === 'operational') {
+                // 정상 -> 지연
+                if (prevStatus === 'operational' && currStatus === 'degraded') {
+                  const currSvc = currentCheck.services.find(s => s.name === t.name);
+                  incidentsData.unshift({
+                    id: Date.now(),
+                    type: 'outage',
+                    service: t.name,
+                    title: `${t.name} 응답 지연 발생`,
+                    time: `${nowStr} ~ 진행 중`,
+                    startTime: nowMs,
+                    duration: '진행 중',
+                    text: `서버 응답 시간이 기준치(${LATENCY_THRESHOLD_MS}ms)를 초과했습니다. (현재 응답 속도: ${currSvc?.latency || 0}ms)`
+                  });
+                }
+
+                // 장애/지연 -> 정상 복구
+                if ((prevStatus === 'outage' || prevStatus === 'degraded') && currStatus === 'operational') {
                   const activeInc = incidentsData.find(i => i.service === t.name && i.duration === '진행 중');
                   if (activeInc) {
                     const diffMin = Math.max(1, Math.round((nowMs - activeInc.startTime) / 60000));
@@ -168,26 +205,28 @@ jobs:
               });
             }
 
-            // 4. 장애 이력 중 하루(24시간) 지난 항목 자동 삭제
+            // 4. 24시간 지난 이력 자동 삭제
             incidentsData = incidentsData.filter(inc => {
               if (!inc.startTime) return true;
               return (nowMs - inc.startTime) < ONE_DAY_MS;
             });
 
-            // 5. 전체 시스템 상태 결정 (정상 / 일부 장애 / 전체 장애)
-            if (downCount === 0) {
-              statusData.systemState = 'operational';
-            } else if (downCount === targets.length) {
+            // 5. 전체 시스템 상태 판단
+            if (outageCount === targets.length) {
               statusData.systemState = 'outage';
-            } else {
+            } else if (outageCount > 0) {
               statusData.systemState = 'partial_outage';
+            } else if (degradedCount > 0) {
+              statusData.systemState = 'degraded';
+            } else {
+              statusData.systemState = 'operational';
             }
 
             statusData.uptime = totalUptimeRatio;
             statusData.lastUpdated = nowStr;
             statusData.services = processedServices;
 
-            // 파일 로컬 저장
+            // 저장
             fs.writeFileSync('status.json', JSON.stringify(statusData, null, 2));
             fs.writeFileSync('maintenance.json', JSON.stringify(maintenanceData, null, 2));
             fs.writeFileSync('incidents.json', JSON.stringify(incidentsData, null, 2));
@@ -197,4 +236,4 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add status.json maintenance.json incidents.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "auto: update system status, maintenance & incidents [KST]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "auto: update status, latency & incidents [KST]" && git push)
