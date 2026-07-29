@@ -1,27 +1,27 @@
 {
   "systemState": "operational",
-  "lastUpdated": "2026. 07. 29. 21:40:27 KST",
+  "lastUpdated": "2026. 07. 29. 21:42:26 KST",
   "uptime": "99.81",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "operational",
-      "latency": 791,
+      "latency": 456,
       "uptime": "100.00"
     },
     {
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "operational",
-      "latency": 754,
-      "uptime": "99.42"
+      "latency": 544,
+      "uptime": "99.43"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "operational",
-      "latency": 790,
+      "latency": 1245,
       "uptime": "100.00"
     }
   ],
@@ -7332,6 +7332,29 @@
           "url": "https://api.yhn.kr",
           "status": "operational",
           "latency": 790
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-07-29T12:42:26.499Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "operational",
+          "latency": 456
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "operational",
+          "latency": 544
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "operational",
+          "latency": 1245
         }
       ]
     }
