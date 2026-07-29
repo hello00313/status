@@ -13,7 +13,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'media', // OS 다크/라이트 모드 자동 감지
+      darkMode: 'media',
     }
   </script>
 
@@ -86,7 +86,7 @@
       <div class="flex items-center justify-between mb-4 px-1">
         <h2 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">점검 및 장애 이력 (최근 24시간)</h2>
         
-        <!-- 필터 버튼 (전체 / 장애 / 점검) -->
+        <!-- 필터 버튼 -->
         <div class="flex items-center p-0.5 bg-gray-200/60 dark:bg-gray-800/60 rounded-lg text-xs font-medium">
           <button id="filter-all" onclick="setFilter('all')" class="px-2.5 py-1 rounded-md transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-700 shadow-sm">
             전체
@@ -116,10 +116,16 @@
         textColor: 'text-emerald-900 dark:text-emerald-300', 
         msg: '모든 시스템이 정상 작동 중입니다.' 
       },
-      partial_outage: { 
-        label: '일부 장애', 
+      degraded: { 
+        label: '응답 지연', 
         color: 'bg-amber-500 dark:bg-amber-400', 
         textColor: 'text-amber-900 dark:text-amber-300', 
+        msg: '일부 시스템에 응답 지연이 있습니다.' 
+      },
+      partial_outage: { 
+        label: '일부 장애', 
+        color: 'bg-orange-500 dark:bg-orange-400', 
+        textColor: 'text-orange-900 dark:text-orange-300', 
         msg: '일부 시스템에 장애가 발생했습니다.' 
       },
       outage: { 
@@ -143,7 +149,6 @@
       try {
         const timestamp = new Date().getTime();
         
-        // 3개의 JSON 파일 수신
         const [statusRes, maintenanceRes, incidentsRes] = await Promise.all([
           fetch(`status.json?t=${timestamp}`).then(r => r.ok ? r.json() : {}),
           fetch(`maintenance.json?t=${timestamp}`).then(r => r.ok ? r.json() : []),
@@ -154,7 +159,6 @@
         const maintenanceData = Array.isArray(maintenanceRes) ? maintenanceRes : [];
         const incidentsData = Array.isArray(incidentsRes) ? incidentsRes : [];
 
-        // 점검 내역과 장애 내역 합치기 (최신순 정렬)
         allEventsData = [...maintenanceData, ...incidentsData].sort((a, b) => (b.id || 0) - (a.id || 0));
 
         renderStatusAndServices(statusData);
@@ -167,7 +171,6 @@
     function setFilter(filterType) {
       currentFilter = filterType;
       
-      // 버튼 스타일 업데이트
       ['all', 'outage', 'maintenance'].forEach(type => {
         const btn = document.getElementById(`filter-${type}`);
         if (type === filterType) {
@@ -194,7 +197,19 @@
       const servicesContainer = document.getElementById('services-container');
 
       servicesContainer.innerHTML = (data.services || []).map(s => {
-        const isUp = s.status === 'operational';
+        const statusKey = s.status || 'operational';
+        
+        let badgeClass = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/40';
+        let badgeText = 'Operational';
+
+        if (statusKey === 'degraded') {
+          badgeClass = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40';
+          badgeText = 'Degraded';
+        } else if (statusKey === 'outage') {
+          badgeClass = 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200/60 dark:border-rose-800/40';
+          badgeText = 'Down';
+        }
+
         const recentHistory = history.slice(-30);
         let barsHtml = '';
         
@@ -205,18 +220,27 @@
 
         recentHistory.forEach(h => {
           const match = (h.services || []).find(item => item.name === s.name);
-          const status = match ? match.status : 'operational';
-          const colorClass = status === 'operational' ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-rose-500 dark:bg-rose-400';
-          barsHtml += `<div class="bar-item ${colorClass}" title="${status === 'operational' ? '정상' : '장애'}"></div>`;
+          const st = match ? match.status : 'operational';
+          let colorClass = 'bg-emerald-500 dark:bg-emerald-400';
+          let titleText = '정상';
+
+          if (st === 'degraded') {
+            colorClass = 'bg-amber-500 dark:bg-amber-400';
+            titleText = '지연';
+          } else if (st === 'outage') {
+            colorClass = 'bg-rose-500 dark:bg-rose-400';
+            titleText = '장애';
+          }
+
+          barsHtml += `<div class="bar-item ${colorClass}" title="${titleText}"></div>`;
         });
 
-        // s.uptime으로 개별 서비스별 가동률 출력
         return `
           <div class="bg-white/80 dark:bg-[#121824]/80 p-5 rounded-2xl border border-gray-200/80 dark:border-gray-800/80 shadow-sm backdrop-blur-xl space-y-3">
             <div class="flex items-center justify-between">
               <span class="font-semibold text-sm text-gray-900 dark:text-gray-100">${s.name}</span>
-              <span class="text-xs font-medium px-2.5 py-0.5 rounded-full font-num ${isUp ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/40'}">
-                ${isUp ? 'Operational' : 'Down'}
+              <span class="text-xs font-medium px-2.5 py-0.5 rounded-full font-num border ${badgeClass}">
+                ${badgeText}
               </span>
             </div>
             
@@ -225,7 +249,7 @@
             </div>
             
             <div class="flex justify-between text-[11px] text-gray-400 dark:text-gray-500 font-num">
-              <span>최근 30회 기록</span>
+              <span>응답 속도: <strong class="text-gray-700 dark:text-gray-300">${s.latency || 0}ms</strong></span>
               <span class="text-gray-600 dark:text-gray-400 font-medium">${s.uptime || '100.00'}% Uptime</span>
             </div>
           </div>
