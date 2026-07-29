@@ -28,7 +28,7 @@ jobs:
               { name: 'Y SERVICE (API)', url: 'https://api.yhn.kr' }
             ];
 
-            // 1. 상태 데이터 (상태.json)
+            // 1. 상태 데이터 (status.json)
             let statusData = {
               systemState: 'operational',
               lastUpdated: '',
@@ -37,10 +37,10 @@ jobs:
               history: []
             };
 
-            // 2. 점검 데이터 (점검.json)
+            // 2. 점검 데이터 (maintenance.json)
             let maintenanceData = [];
 
-            // 3. 장애 데이터 (장애.json)
+            // 3. 장애 데이터 (incidents.json)
             let incidentsData = [];
 
             // 기존 JSON 파일들 로드
@@ -56,8 +56,9 @@ jobs:
 
             if (!statusData.history) statusData.history = [];
 
-            let allOk = true;
             const now = new Date();
+            const nowMs = now.getTime();
+            const ONE_DAY_MS = 24 * 60 * 60 * 1000; // 24시간 밀리초
             
             // KST 포맷팅
             const kstFormatter = new Intl.DateTimeFormat('ko-KR', {
@@ -77,6 +78,8 @@ jobs:
               services: []
             };
 
+            let downCount = 0;
+
             for (const t of targets) {
               let isUp = false;
               try {
@@ -86,7 +89,7 @@ jobs:
                 isUp = false;
               }
 
-              if (!isUp) allOk = false;
+              if (!isUp) downCount++;
 
               currentCheck.services.push({
                 name: t.name,
@@ -99,7 +102,7 @@ jobs:
             statusData.history.push(currentCheck);
             if (statusData.history.length > 1000) statusData.history.shift();
 
-            // 가동률 계산
+            // 1. 전체 가동률 계산
             let totalChecks = 0;
             let upChecks = 0;
             statusData.history.forEach(h => {
@@ -108,9 +111,33 @@ jobs:
                 if (s.status === 'operational') upChecks++;
               });
             });
-            const uptimeRatio = totalChecks > 0 ? ((upChecks / totalChecks) * 100).toFixed(2) : '100.00';
+            const totalUptimeRatio = totalChecks > 0 ? ((upChecks / totalChecks) * 100).toFixed(2) : '100.00';
 
-            // 장애 감지
+            // 2. 서버별 개별 가동률 및 서비스 데이터 구성
+            const processedServices = targets.map(t => {
+              let serviceTotal = 0;
+              let serviceUp = 0;
+
+              statusData.history.forEach(h => {
+                const match = (h.services || []).find(s => s.name === t.name);
+                if (match) {
+                  serviceTotal++;
+                  if (match.status === 'operational') serviceUp++;
+                }
+              });
+
+              const serviceUptime = serviceTotal > 0 ? ((serviceUp / serviceTotal) * 100).toFixed(2) : '100.00';
+              const currentServiceStatus = currentCheck.services.find(s => s.name === t.name)?.status || 'operational';
+
+              return {
+                name: t.name,
+                url: t.url,
+                status: currentServiceStatus,
+                uptime: serviceUptime
+              };
+            });
+
+            // 3. 장애 감지
             const prevCheck = statusData.history.length > 1 ? statusData.history[statusData.history.length - 2] : null;
             if (prevCheck) {
               targets.forEach(t => {
@@ -124,7 +151,7 @@ jobs:
                     service: t.name,
                     title: `${t.name} 서비스 연결 장애 발생`,
                     time: `${nowStr} ~ 진행 중`,
-                    startTime: now.getTime(),
+                    startTime: nowMs,
                     duration: '진행 중',
                     text: '자동 모니터링 시스템에 의해 응답 지연 또는 장애가 감지되었습니다.'
                   });
@@ -133,7 +160,7 @@ jobs:
                 if (prevStatus === 'outage' && currStatus === 'operational') {
                   const activeInc = incidentsData.find(i => i.service === t.name && i.duration === '진행 중');
                   if (activeInc) {
-                    const diffMin = Math.max(1, Math.round((now.getTime() - activeInc.startTime) / 60000));
+                    const diffMin = Math.max(1, Math.round((nowMs - activeInc.startTime) / 60000));
                     activeInc.duration = `${diffMin}분 동안 발생`;
                     activeInc.time = `${activeInc.time.replace('~ 진행 중', '')} ~ ${nowStr.split(' ')[3] || ''} (${diffMin}분간)`;
                   }
@@ -141,12 +168,26 @@ jobs:
               });
             }
 
-            statusData.systemState = allOk ? 'operational' : 'outage';
-            statusData.uptime = uptimeRatio;
-            statusData.lastUpdated = nowStr;
-            statusData.services = currentCheck.services;
+            // 4. 장애 이력 중 하루(24시간) 지난 항목 자동 삭제
+            incidentsData = incidentsData.filter(inc => {
+              if (!inc.startTime) return true;
+              return (nowMs - inc.startTime) < ONE_DAY_MS;
+            });
 
-            // 3개의 분리된 JSON 파일로 저장
+            // 5. 전체 시스템 상태 결정 (정상 / 일부 장애 / 전체 장애)
+            if (downCount === 0) {
+              statusData.systemState = 'operational';
+            } else if (downCount === targets.length) {
+              statusData.systemState = 'outage';
+            } else {
+              statusData.systemState = 'partial_outage';
+            }
+
+            statusData.uptime = totalUptimeRatio;
+            statusData.lastUpdated = nowStr;
+            statusData.services = processedServices;
+
+            // 파일 로컬 저장
             fs.writeFileSync('status.json', JSON.stringify(statusData, null, 2));
             fs.writeFileSync('maintenance.json', JSON.stringify(maintenanceData, null, 2));
             fs.writeFileSync('incidents.json', JSON.stringify(incidentsData, null, 2));
