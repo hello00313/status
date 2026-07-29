@@ -84,7 +84,7 @@
     <!-- Incident Log Section -->
     <section class="mb-12">
       <div class="flex items-center justify-between mb-4 px-1">
-        <h2 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">점검 및 장애 이력</h2>
+        <h2 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">점검 및 장애 이력 (최근 24시간)</h2>
         
         <!-- 필터 버튼 (전체 / 장애 / 점검) -->
         <div class="flex items-center p-0.5 bg-gray-200/60 dark:bg-gray-800/60 rounded-lg text-xs font-medium">
@@ -110,8 +110,24 @@
 
   <script>
     const STATUS_MAP = {
-      operational: { label: '정상 작동 중', color: 'bg-emerald-500 dark:bg-emerald-400', textColor: 'text-emerald-900 dark:text-emerald-300', msg: '모든 시스템이 정상 작동 중입니다.' },
-      outage: { label: '서비스 장애', color: 'bg-rose-500 dark:bg-rose-400', textColor: 'text-rose-900 dark:text-rose-300', msg: '일부 서비스에 응답 지연이 있습니다.' }
+      operational: { 
+        label: '정상 작동 중', 
+        color: 'bg-emerald-500 dark:bg-emerald-400', 
+        textColor: 'text-emerald-900 dark:text-emerald-300', 
+        msg: '모든 시스템이 정상 작동 중입니다.' 
+      },
+      partial_outage: { 
+        label: '일부 장애', 
+        color: 'bg-amber-500 dark:bg-amber-400', 
+        textColor: 'text-amber-900 dark:text-amber-300', 
+        msg: '일부 시스템에 장애가 발생했습니다.' 
+      },
+      outage: { 
+        label: '전체 장애', 
+        color: 'bg-rose-500 dark:bg-rose-400', 
+        textColor: 'text-rose-900 dark:text-rose-300', 
+        msg: '전체 시스템에 장애가 발생했습니다.' 
+      }
     };
 
     const INCIDENT_TYPES = {
@@ -127,7 +143,7 @@
       try {
         const timestamp = new Date().getTime();
         
-        // 3개의 JSON 파일(상태, 점검, 장애)을 병렬 수신
+        // 3개의 JSON 파일 수신
         const [statusRes, maintenanceRes, incidentsRes] = await Promise.all([
           fetch(`status.json?t=${timestamp}`).then(r => r.ok ? r.json() : {}),
           fetch(`maintenance.json?t=${timestamp}`).then(r => r.ok ? r.json() : []),
@@ -194,6 +210,7 @@
           barsHtml += `<div class="bar-item ${colorClass}" title="${status === 'operational' ? '정상' : '장애'}"></div>`;
         });
 
+        // s.uptime으로 개별 서비스별 가동률 출력
         return `
           <div class="bg-white/80 dark:bg-[#121824]/80 p-5 rounded-2xl border border-gray-200/80 dark:border-gray-800/80 shadow-sm backdrop-blur-xl space-y-3">
             <div class="flex items-center justify-between">
@@ -209,7 +226,7 @@
             
             <div class="flex justify-between text-[11px] text-gray-400 dark:text-gray-500 font-num">
               <span>최근 30회 기록</span>
-              <span class="text-gray-600 dark:text-gray-400 font-medium">${data.uptime || '100.00'}% Uptime</span>
+              <span class="text-gray-600 dark:text-gray-400 font-medium">${s.uptime || '100.00'}% Uptime</span>
             </div>
           </div>
         `;
@@ -219,7 +236,6 @@
     function renderIncidents() {
       const incContainer = document.getElementById('incidents-container');
       
-      // 필터링 적용 (장애: outage, 점검: maintenance 또는 scheduled)
       const filtered = allEventsData.filter(item => {
         if (currentFilter === 'all') return true;
         if (currentFilter === 'outage') return item.type === 'outage';
