@@ -1,51 +1,31 @@
 {
   "systemState": "operational",
-  "lastUpdated": "2026. 07. 30. 20:52:14 KST",
+  "lastUpdated": "2026. 07. 30. 20:54:16 KST",
   "uptime": "99.70",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "operational",
-      "latency": 732,
+      "latency": 550,
       "uptime": "100.00"
     },
     {
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "operational",
-      "latency": 715,
+      "latency": 519,
       "uptime": "99.20"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "operational",
-      "latency": 707,
+      "latency": 526,
       "uptime": "99.90"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-07-29T02:42:15.911Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "operational"
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "operational"
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "operational"
-        }
-      ]
-    },
     {
       "timestamp": "2026-07-29T02:44:14.572Z",
       "services": [
@@ -22492,6 +22472,29 @@
           "url": "https://api.yhn.kr",
           "status": "operational",
           "latency": 707
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-07-30T11:54:16.345Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "operational",
+          "latency": 550
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "operational",
+          "latency": 519
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "operational",
+          "latency": 526
         }
       ]
     }
