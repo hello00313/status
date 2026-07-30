@@ -1,51 +1,31 @@
 {
   "systemState": "operational",
-  "lastUpdated": "2026. 07. 30. 21:40:21 KST",
+  "lastUpdated": "2026. 07. 30. 21:42:15 KST",
   "uptime": "99.70",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "operational",
-      "latency": 807,
+      "latency": 580,
       "uptime": "100.00"
     },
     {
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "operational",
-      "latency": 791,
+      "latency": 593,
       "uptime": "99.20"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "operational",
-      "latency": 780,
+      "latency": 456,
       "uptime": "99.90"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-07-29T03:30:28.533Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "operational"
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "operational"
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "operational"
-        }
-      ]
-    },
     {
       "timestamp": "2026-07-29T03:32:15.599Z",
       "services": [
@@ -22564,6 +22544,29 @@
           "url": "https://api.yhn.kr",
           "status": "operational",
           "latency": 780
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-07-30T12:42:15.088Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "operational",
+          "latency": 580
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "operational",
+          "latency": 593
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "operational",
+          "latency": 456
         }
       ]
     }
