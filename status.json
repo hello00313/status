@@ -1,51 +1,31 @@
 {
   "systemState": "operational",
-  "lastUpdated": "2026. 07. 30. 22:18:15 KST",
+  "lastUpdated": "2026. 07. 30. 22:20:29 KST",
   "uptime": "99.70",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "operational",
-      "latency": 779,
+      "latency": 626,
       "uptime": "100.00"
     },
     {
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "operational",
-      "latency": 727,
+      "latency": 596,
       "uptime": "99.20"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "operational",
-      "latency": 740,
+      "latency": 612,
       "uptime": "99.90"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-07-29T04:08:20.134Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "operational"
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "operational"
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "operational"
-        }
-      ]
-    },
     {
       "timestamp": "2026-07-29T04:10:22.406Z",
       "services": [
@@ -22621,6 +22601,29 @@
           "url": "https://api.yhn.kr",
           "status": "operational",
           "latency": 740
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-07-30T13:20:29.880Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "operational",
+          "latency": 626
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "operational",
+          "latency": 596
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "operational",
+          "latency": 612
         }
       ]
     }
