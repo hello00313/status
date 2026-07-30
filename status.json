@@ -1,51 +1,31 @@
 {
   "systemState": "operational",
-  "lastUpdated": "2026. 07. 30. 19:54:14 KST",
+  "lastUpdated": "2026. 07. 30. 19:56:16 KST",
   "uptime": "99.77",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "operational",
-      "latency": 796,
+      "latency": 800,
       "uptime": "100.00"
     },
     {
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "operational",
-      "latency": 770,
+      "latency": 778,
       "uptime": "99.40"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "operational",
-      "latency": 782,
+      "latency": 768,
       "uptime": "99.90"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-07-29T01:44:14.068Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "operational"
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "operational"
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "operational"
-        }
-      ]
-    },
     {
       "timestamp": "2026-07-29T01:46:14.613Z",
       "services": [
@@ -22405,6 +22385,29 @@
           "url": "https://api.yhn.kr",
           "status": "operational",
           "latency": 782
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-07-30T10:56:16.074Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "operational",
+          "latency": 800
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "operational",
+          "latency": 778
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "operational",
+          "latency": 768
         }
       ]
     }
