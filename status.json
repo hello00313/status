@@ -1,51 +1,31 @@
 {
   "systemState": "operational",
-  "lastUpdated": "2026. 07. 30. 19:18:23 KST",
+  "lastUpdated": "2026. 07. 30. 19:20:20 KST",
   "uptime": "99.73",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "operational",
-      "latency": 600,
+      "latency": 810,
       "uptime": "100.00"
     },
     {
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "operational",
-      "latency": 586,
+      "latency": 784,
       "uptime": "99.30"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "operational",
-      "latency": 431,
+      "latency": 763,
       "uptime": "99.90"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-07-29T01:08:20.287Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "operational"
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "operational"
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "operational"
-        }
-      ]
-    },
     {
       "timestamp": "2026-07-29T01:10:29.139Z",
       "services": [
@@ -22351,6 +22331,29 @@
           "url": "https://api.yhn.kr",
           "status": "operational",
           "latency": 431
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-07-30T10:20:20.723Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "operational",
+          "latency": 810
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "operational",
+          "latency": 784
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "operational",
+          "latency": 763
         }
       ]
     }
