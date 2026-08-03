@@ -1,6 +1,6 @@
 {
   "systemState": "operational",
-  "lastUpdated": "2026. 08. 03. 17:32:16 KST",
+  "lastUpdated": "2026. 08. 03. 17:34:38 KST",
   "uptime": "99.57",
   "services": [
     {
@@ -14,41 +14,18 @@
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "operational",
-      "latency": 679,
+      "latency": 675,
       "uptime": "98.70"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "operational",
-      "latency": 657,
+      "latency": 663,
       "uptime": "100.00"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-08-01T20:10:21.790Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "operational",
-          "latency": 585
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "operational",
-          "latency": 584
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "operational",
-          "latency": 576
-        }
-      ]
-    },
     {
       "timestamp": "2026-08-01T20:12:15.851Z",
       "services": [
@@ -23023,6 +23000,29 @@
           "url": "https://api.yhn.kr",
           "status": "operational",
           "latency": 657
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-08-03T08:34:38.290Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "operational",
+          "latency": 693
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "operational",
+          "latency": 675
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "operational",
+          "latency": 663
         }
       ]
     }
