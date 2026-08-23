@@ -1,54 +1,31 @@
 {
   "systemState": "outage",
-  "lastUpdated": "2026. 08. 24. 05:18:15 KST",
-  "uptime": "78.70",
+  "lastUpdated": "2026. 08. 24. 05:20:22 KST",
+  "uptime": "78.60",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "outage",
       "latency": 8009,
-      "uptime": "79.10"
+      "uptime": "79.00"
     },
     {
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "outage",
       "latency": 8007,
-      "uptime": "77.90"
+      "uptime": "77.80"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "outage",
       "latency": 8007,
-      "uptime": "79.10"
+      "uptime": "79.00"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-08-22T11:46:06.588Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "operational",
-          "latency": 584
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "operational",
-          "latency": 558
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "operational",
-          "latency": 409
-        }
-      ]
-    },
     {
       "timestamp": "2026-08-22T11:48:17.253Z",
       "services": [
@@ -23005,6 +22982,29 @@
     },
     {
       "timestamp": "2026-08-23T20:18:15.478Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "outage",
+          "latency": 8009
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "outage",
+          "latency": 8007
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "outage",
+          "latency": 8007
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-08-23T20:20:22.324Z",
       "services": [
         {
           "name": "Y SERVICE (WEB)",
