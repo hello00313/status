@@ -1,54 +1,31 @@
 {
   "systemState": "outage",
-  "lastUpdated": "2026. 08. 31. 02:12:20 KST",
+  "lastUpdated": "2026. 08. 31. 02:14:16 KST",
   "uptime": "16.77",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "outage",
-      "latency": 8008,
+      "latency": 8005,
       "uptime": "16.80"
     },
     {
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "outage",
-      "latency": 8006,
+      "latency": 8005,
       "uptime": "16.70"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "outage",
-      "latency": 8007,
+      "latency": 8006,
       "uptime": "16.80"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-08-29T07:58:14.393Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "outage",
-          "latency": 8009
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "outage",
-          "latency": 8005
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "outage",
-          "latency": 8007
-        }
-      ]
-    },
     {
       "timestamp": "2026-08-29T08:00:33.364Z",
       "services": [
@@ -23023,6 +23000,29 @@
           "url": "https://api.yhn.kr",
           "status": "outage",
           "latency": 8007
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-08-30T17:14:16.327Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "outage",
+          "latency": 8005
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "outage",
+          "latency": 8005
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "outage",
+          "latency": 8006
         }
       ]
     }
