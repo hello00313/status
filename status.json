@@ -1,54 +1,31 @@
 {
   "systemState": "partial_outage",
-  "lastUpdated": "2026. 10. 30. 21:32:16 KST",
-  "uptime": "0.13",
+  "lastUpdated": "2026. 10. 30. 21:34:16 KST",
+  "uptime": "0.17",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "operational",
-      "latency": 804,
-      "uptime": "0.40"
+      "latency": 722,
+      "uptime": "0.50"
     },
     {
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "outage",
-      "latency": 580,
+      "latency": 345,
       "uptime": "0.00"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "outage",
-      "latency": 569,
+      "latency": 517,
       "uptime": "0.00"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-10-29T03:18:15.075Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "outage",
-          "latency": 8008
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "outage",
-          "latency": 8005
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "outage",
-          "latency": 8006
-        }
-      ]
-    },
     {
       "timestamp": "2026-10-29T03:20:22.892Z",
       "services": [
@@ -23023,6 +23000,29 @@
           "url": "https://api.yhn.kr",
           "status": "outage",
           "latency": 569
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-30T12:34:16.211Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "operational",
+          "latency": 722
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "outage",
+          "latency": 345
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "outage",
+          "latency": 517
         }
       ]
     }
