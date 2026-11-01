@@ -1,14 +1,14 @@
 {
   "systemState": "outage",
-  "lastUpdated": "2026. 11. 01. 22:18:16 KST",
-  "uptime": "56.43",
+  "lastUpdated": "2026. 11. 01. 22:20:24 KST",
+  "uptime": "56.37",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "outage",
-      "latency": 8003,
-      "uptime": "56.50"
+      "latency": 8009,
+      "uptime": "56.40"
     },
     {
       "name": "Y SERVICE (BLOG)",
@@ -21,34 +21,11 @@
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "outage",
-      "latency": 8003,
-      "uptime": "56.50"
+      "latency": 8007,
+      "uptime": "56.40"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-10-31T04:06:16.042Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "operational",
-          "latency": 755
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "outage",
-          "latency": 8001
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "operational",
-          "latency": 636
-        }
-      ]
-    },
     {
       "timestamp": "2026-10-31T04:08:15.135Z",
       "services": [
@@ -23023,6 +23000,29 @@
           "url": "https://api.yhn.kr",
           "status": "outage",
           "latency": 8003
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-01T13:20:24.320Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "outage",
+          "latency": 8009
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "outage",
+          "latency": 8007
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "outage",
+          "latency": 8007
         }
       ]
     }
