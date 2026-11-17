@@ -1,54 +1,31 @@
 {
   "systemState": "outage",
-  "lastUpdated": "2026. 11. 17. 12:02:24 KST",
+  "lastUpdated": "2026. 11. 17. 12:04:24 KST",
   "uptime": "0.00",
   "services": [
     {
       "name": "Y SERVICE (WEB)",
       "url": "https://yhn.kr",
       "status": "outage",
-      "latency": 3493,
+      "latency": 3325,
       "uptime": "0.00"
     },
     {
       "name": "Y SERVICE (BLOG)",
       "url": "https://blog.yhn.kr",
       "status": "outage",
-      "latency": 3288,
+      "latency": 3279,
       "uptime": "0.00"
     },
     {
       "name": "Y SERVICE (API)",
       "url": "https://api.yhn.kr",
       "status": "outage",
-      "latency": 3110,
+      "latency": 3279,
       "uptime": "0.00"
     }
   ],
   "history": [
-    {
-      "timestamp": "2026-11-15T16:48:17.763Z",
-      "services": [
-        {
-          "name": "Y SERVICE (WEB)",
-          "url": "https://yhn.kr",
-          "status": "outage",
-          "latency": 8006
-        },
-        {
-          "name": "Y SERVICE (BLOG)",
-          "url": "https://blog.yhn.kr",
-          "status": "outage",
-          "latency": 8004
-        },
-        {
-          "name": "Y SERVICE (API)",
-          "url": "https://api.yhn.kr",
-          "status": "outage",
-          "latency": 8006
-        }
-      ]
-    },
     {
       "timestamp": "2026-11-15T16:50:30.363Z",
       "services": [
@@ -23023,6 +23000,29 @@
           "url": "https://api.yhn.kr",
           "status": "outage",
           "latency": 3110
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-17T03:04:24.874Z",
+      "services": [
+        {
+          "name": "Y SERVICE (WEB)",
+          "url": "https://yhn.kr",
+          "status": "outage",
+          "latency": 3325
+        },
+        {
+          "name": "Y SERVICE (BLOG)",
+          "url": "https://blog.yhn.kr",
+          "status": "outage",
+          "latency": 3279
+        },
+        {
+          "name": "Y SERVICE (API)",
+          "url": "https://api.yhn.kr",
+          "status": "outage",
+          "latency": 3279
         }
       ]
     }
